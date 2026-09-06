@@ -30,7 +30,6 @@ const Wrench = makeIcon('\u{1F527}');
 const PackageOpen = makeIcon('\u{1F4E6}');
 const TrendingUp = makeIcon('\u{1F4C8}');
 
-// --- localStorage-backed polyfill matching the window.storage API used by the app ---
 window.storage = {
   async get(key, shared) {
     const raw = localStorage.getItem(key);
@@ -152,18 +151,25 @@ function xpForLevel(level) {
   return level * 100;
 }
 
+function pad2(n) {
+  return String(n).padStart(2, "0");
+}
+
 function todayStr() {
-  return new Date().toISOString().slice(0, 10);
+  const d = new Date();
+  return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
 }
 
 function monthStr() {
-  return new Date().toISOString().slice(0, 7);
+  const d = new Date();
+  return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}`;
 }
 
 function addDays(dateStr, delta) {
-  const d = new Date(dateStr + "T00:00:00");
+  const [y, m, day] = dateStr.split("-").map(Number);
+  const d = new Date(y, m - 1, day); // local time, no UTC conversion
   d.setDate(d.getDate() + delta);
-  return d.toISOString().slice(0, 10);
+  return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
 }
 
 function isDayComplete(dailyDefs, dailyLog, dateStr) {
